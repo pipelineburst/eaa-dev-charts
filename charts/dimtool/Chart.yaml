@@ -1,0 +1,6 @@
+apiVersion: v2
+name: dimtool
+description: Deploys the Dim Tool Engine for EKS
+type: application
+version: 0.0.1
+appVersion: "1.0.1"

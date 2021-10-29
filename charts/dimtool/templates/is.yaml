@@ -1,0 +1,13 @@
+{{ if .Values.internal_registry }}
+apiVersion: v1
+kind: ImageStream
+metadata:
+  name: dimtool
+spec:
+  dockerImageRepository: "{{ .Values.mycomosi_registry_url }}/{{ .Values.docker_registry_project }}/dimtool"
+  tags:
+  - from:
+      kind: DockerImage
+      name: "{{ .Values.mycomosi_registry_url }}/{{ .Values.docker_registry_project }}/dimtool:{{ .Values.dimtool_version }}"
+    name: {{ .Values.dimtool_version }}
+{{ end }}

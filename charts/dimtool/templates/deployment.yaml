@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dimtoolweb
+  labels:
+    app: dimtool
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dimtool
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: dimtool
+    spec:
+      containers:
+      - env:
+        - name: MEMORY_LIMIT
+          valueFrom:
+            resourceFieldRef:
+              resource: limits.memory
+        image: "{{ .Values.docker_registry_url }}/{{ .Values.docker_registry_project }}/dimtool:{{ .Values.dimtool_version }}"
+        imagePullPolicy: Always
+        name: dimtool
+        livenessProbe:
+          httpGet:
+            path: /status
+            port: {{ .Values.service.port }}
+          initialDelaySeconds: 30
+          periodSeconds: 60
+          timeoutSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /status
+            port: {{ .Values.service.port }}
+          initialDelaySeconds: 30
+          periodSeconds: 20
+          timeoutSeconds: 1
+        ports:
+        - containerPort: {{ .Values.service.port }}
+          protocol: TCP
+        resources:
+          limits:
+            cpu: {{ .Values.dimtool_cpu_resource_limit }}
+            memory: {{ .Values.dimtool_memory_resource_limit }}
+          requests:
+            cpu: {{ .Values.dimtool_cpu_resource_request }}
+            memory: {{ .Values.dimtool_memory_resource_request }}
+      imagePullSecrets:
+      - name: docker-secret
